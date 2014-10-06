@@ -63,18 +63,13 @@ cmd_upgrade() {
 		die "A newer version of the HubFlow tools is available"
 	fi
 
-	# make sure we have permissions
-	if [ `id -u` != 0 ] ; then
-		die "Not running as root (try using sudo?)"
-	fi
-
 	# make sure there isn't already a gitflow folder here
 	if [ -e gitflow ] ; then
 		die "Cannot clone the HubFlow repo; there's already a folder called 'gitflow' in your current working directory"
 	fi
 
 	git clone --recursive $HUBFLOW_REPO || die "Unable to clone the HubFlow repo"
-	cd gitflow || die "Could not find the gitflow repo we've just cloned"
+	cd hubflow || die "Could not find the gitflow repo we've just cloned"
 	./install.sh || die "Failed to install gitflow"
 	cd ..
 	rm -rf ./gitflow || die "Unable to remove the gitflow repo we've just cloned"
