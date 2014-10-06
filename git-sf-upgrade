@@ -11,7 +11,8 @@
 # Feel free to contribute to this project at:
 #    http://github.com/datasift/gitflow
 #
-# Copyright 2013 MediaSift Ltd. All rights reserved.
+# Copyright 2010 Vincent Driessen. All rights reserved.
+# Copyright 2012 MediaSift Ltd. All rights reserved.
 #
 #
 # Redistribution and use in source and binary forms, with or without
@@ -40,61 +41,41 @@
 # policies, either expressed or implied, of Vincent Driessen.
 #
 
-require_git_repo
-require_hubflow_initialized
-hubflow_load_settings
-
 usage() {
-    echo "usage: git hf push [-f]"
+	echo "usage: git sf upgrade"
 }
 
 cmd_default() {
-    cmd_push "$@"
+	cmd_upgrade "$@"
 }
 
 cmd_help() {
-    usage
-    exit 0
+	usage
+	exit 0
 }
 
-parse_args() {
-    # parse options
-    FLAGS "$@" || exit $?
-    eval set -- "${FLAGS_ARGV}"
-}
+cmd_upgrade() {
+	DEFINE_boolean check false "check for upgrade, but do not upgrade" c
+	# is there a new version available?
+	if ! springflow_has_new_version_available > /dev/null ; then
+		die "You are already running the latest version"
+	elif flag check ; then
+		die "A newer version of the HubFlow tools is available"
+	fi
 
-cmd_push() {
-    DEFINE_boolean force false "Forces a destructive push using the --force/-f flag" F
-    parse_args "$@"
+	# make sure there isn't already a gitflow folder here
+	if [ -e gitflow ] ; then
+		die "Cannot clone the HubFlow repo; there's already a folder called 'gitflow' in your current working directory"
+	fi
 
-    # make sure we're okay to start
-    require_clean_working_tree
+	git clone --recursive $SPRINGFLOW_REPO || die "Unable to clone the HubFlow repo"
+	cd springflow || die "Could not find the gitflow repo we've just cloned"
+	./install.sh || die "Failed to install gitflow"
+	cd ..
+	rm -rf ./springflow || die "Unable to remove the gitflow repo we've just cloned"
 
-    # fetch and merge the latest changes from origin
-    hubflow_fetch_latest_changes_from_origin
-    hubflow_remote_merge_helper "$ORIGIN" "$BRANCH"
-
-    # push to origin
-    if flag force ; then
-        hubflow_push_latest_changes_to_origin force
-    else
-        hubflow_push_latest_changes_to_origin
-    fi
-    local result=$?
-
-    # what happened?
-    echo
-    echo "Summary of actions:"
-    if [[ $result -eq 1 ]] ; then
-        echo "- A new remote branch '$ORIGIN/$BRANCH' was created"
-        echo "- The local branch '$BRANCH' was configured to track the remote branch"
-    elif [[ $result -eq 2 ]] ; then
-        echo "- The remote branch '$ORIGIN/$BRANCH' was overwritten with your changes"
-    elif [[ $result -eq 3 ]] ; then
-        echo "- The remote branch '$ORIGIN/$BRANCH' was updated with your changes"
-    else
-        echo "- No action taken, '$ORIGIN/$BRANCH' already up-to-date"
-    fi
-
-    # all done
+	echo
+	echo "Summary of actions:"
+	echo "- A new version of the HubFlow tools has been installed"
+	echo
 }

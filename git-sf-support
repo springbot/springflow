@@ -42,17 +42,17 @@
 #
 
 require_git_repo
-require_hubflow_initialized
-hubflow_load_settings
-VERSION_PREFIX=$(eval "echo `git config --get hubflow.prefix.versiontag`")
-PREFIX=$(git config --get hubflow.prefix.support)
+require_springflow_initialized
+springflow_load_settings
+VERSION_PREFIX=$(eval "echo `git config --get springflow.prefix.versiontag`")
+PREFIX=$(git config --get springflow.prefix.support)
 
 warn "note: The support subcommand is still very EXPERIMENTAL!"
 warn "note: DO NOT use it in a production situation."
 
 usage() {
-	echo "usage: git hf support [list] [-v]"
-	echo "       git hf support start [-F] <version> <base>"
+	echo "usage: git sf support [list] [-v]"
+	echo "       git sf support start [-F] <version> <base>"
 }
 
 cmd_default() {
@@ -72,7 +72,7 @@ cmd_list() {
                 warn ""
                 warn "You can start a new support branch:"
                 warn ""
-                warn "    git hf support start <name> <base>"
+                warn "    git sf support start <name> <base>"
                 warn ""
 		exit 0
 	fi

@@ -51,10 +51,10 @@ fi
 
 # The sed expression here replaces all backslashes by forward slashes.
 # This helps our Windows users, while not bothering our Unix users.
-export HUBFLOW_DIR=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
+export SPRINGFLOW_DIR=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
 
 usage() {
-	echo "usage: git hf <subcommand>"
+	echo "usage: git sf <subcommand>"
 	echo
 	echo "Available subcommands are:"
 	echo "   init      Initialize a new git repo with support for the branching model."
@@ -66,7 +66,7 @@ usage() {
 	echo "   update    Pull upstream changes down into your master and develop branches."
 	echo "   version   Shows version information."
 	echo
-	echo "Try 'git hf <subcommand> help' for details."
+	echo "Try 'git sf <subcommand> help' for details."
 }
 
 main() {
@@ -76,7 +76,7 @@ main() {
 	fi
 
 	# load common functionality
-	. "$HUBFLOW_DIR/hubflow-common"
+	. "$SPRINGFLOW_DIR/springflow-common"
 
 	# This environmental variable fixes non-POSIX getopt style argument
 	# parsing, effectively breaking git-flow subcommand parsing on several
@@ -84,22 +84,22 @@ main() {
 	export POSIXLY_CORRECT=1
 
 	# use the shFlags project to parse the command line arguments
-	. "$HUBFLOW_DIR/hubflow-shFlags"
-	FLAGS_PARENT="git hf"
+	. "$SPRINGFLOW_DIR/springflow-shFlags"
+	FLAGS_PARENT="git sf"
 	FLAGS "$@" || exit $?
 	eval set -- "${FLAGS_ARGV}"
 
 	# sanity checks
 	SUBCOMMAND="$1"; shift
 
-	if [ ! -e "$HUBFLOW_DIR/git-hf-$SUBCOMMAND" ]; then
+	if [ ! -e "$SPRINGFLOW_DIR/git-sf-$SUBCOMMAND" ]; then
 		usage
 		exit 1
 	fi
 
 	# run command
-	. "$HUBFLOW_DIR/git-hf-$SUBCOMMAND"
-	FLAGS_PARENT="git hf $SUBCOMMAND"
+	. "$SPRINGFLOW_DIR/git-sf-$SUBCOMMAND"
+	FLAGS_PARENT="git sf $SUBCOMMAND"
 
 	# test if the first argument is a flag (i.e. starts with '-')
 	# in that case, we interpret this arg as a flag for the default

@@ -41,12 +41,22 @@
 # policies, either expressed or implied, of Vincent Driessen.
 #
 
+require_git_repo
+require_springflow_initialized
+springflow_load_settings
+
 usage() {
-	echo "usage: git hf upgrade"
+	echo "usage: git sf update [-p]"
+}
+
+parse_args() {
+	# parse options
+	FLAGS "$@" || exit $?
+	eval set -- "${FLAGS_ARGV}"
 }
 
 cmd_default() {
-	cmd_upgrade "$@"
+	cmd_update "$@"
 }
 
 cmd_help() {
@@ -54,28 +64,36 @@ cmd_help() {
 	exit 0
 }
 
-cmd_upgrade() {
-	DEFINE_boolean check false "check for upgrade, but do not upgrade" c
-	# is there a new version available?
-	if ! hubflow_has_new_version_available > /dev/null ; then
-		die "You are already running the latest version"
-	elif flag check ; then
-		die "A newer version of the HubFlow tools is available"
+cmd_update() {
+	# flags
+	DEFINE_boolean prune true "delete local copies of branches that have been deleted from $ORIGIN" p
+	parse_args "$@"
+
+	# make sure we're okay to start
+	require_clean_working_tree
+
+	# fetch and merge the latest changes from origin
+	springflow_merge_latest_changes_from_origin
+
+	# make sure we end up where we should be
+	if [[ $(git_current_branch) != $BRANCH ]] ; then
+		git checkout "$BRANCH"
 	fi
 
-	# make sure there isn't already a gitflow folder here
-	if [ -e gitflow ] ; then
-		die "Cannot clone the HubFlow repo; there's already a folder called 'gitflow' in your current working directory"
+	# drop any branches that have disappeared from origin
+	if flag prune ; then
+		git fetch --prune || die "Unable to prune branches that no longer exist at '$ORIGIN'"
 	fi
 
-	git clone --recursive $HUBFLOW_REPO || die "Unable to clone the HubFlow repo"
-	cd hubflow || die "Could not find the gitflow repo we've just cloned"
-	./install.sh || die "Failed to install gitflow"
-	cd ..
-	rm -rf ./gitflow || die "Unable to remove the gitflow repo we've just cloned"
-
+	# all done
 	echo
 	echo "Summary of actions:"
-	echo "- A new version of the HubFlow tools has been installed"
-	echo
+	echo "- Any changes to branches at $ORIGIN have been downloaded to your local repository"
+	if flag prune ; then
+		echo "- Any branches that have been deleted at $ORIGIN have also been deleted from your local repository"
+	fi
+	echo "- Any changes from $ORIGIN/$MASTER_BRANCH have been merged into branch '$MASTER_BRANCH'"
+	echo "- Any changes from $ORIGIN/$DEVELOP_BRANCH have been merged into branch '$DEVELOP_BRANCH'"
+	echo "- Any resolved merge conflicts have been pushed back to $ORIGIN"
+	echo "- You are now on branch '$BRANCH'"
 }

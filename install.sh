@@ -30,11 +30,6 @@ check_write_access()
     # do we have write permissions?
     if [[ ! -w "$target" ]]; then
         echo "'$target' is not writable by $(whoami)"
-
-        # should we be running as root?
-        if [[ `id -u` != 0 ]]; then
-            echo "Run as install as root (use sudo)"
-        fi
         return 1
     fi
     return 0
@@ -48,13 +43,13 @@ if [ -z "$INSTALL_INTO" ] ; then
 fi
 
 REPO_DIR="$(dirname $0)"
-EXEC_FILES="git-hf"
-SCRIPT_FILES="git-hf-init git-hf-feature git-hf-hotfix git-hf-push git-hf-pull git-hf-release git-hf-support git-hf-update git-hf-upgrade git-hf-version hubflow-common hubflow-shFlags"
-SUBMODULE_FILE="hubflow-shFlags"
+EXEC_FILES="git-sf"
+SCRIPT_FILES="git-sf-init git-sf-feature git-sf-hotfix git-sf-push git-sf-pull git-sf-release git-sf-support git-sf-update git-sf-upgrade git-sf-version springflow-common springflow-shFlags"
+SUBMODULE_FILE="springflow-shFlags"
 
 case "$1" in
     uninstall)
-        echo "Uninstalling hubflow from $INSTALL_INTO"
+        echo "Uninstalling springflow from $INSTALL_INTO"
         if [ -d "$INSTALL_INTO" ] ; then
             for script_file in $SCRIPT_FILES $EXEC_FILES ; do
                 echo "rm -vf $INSTALL_INTO/$script_file"
@@ -77,7 +72,7 @@ case "$1" in
         check_write_access "$INSTALL_INTO" || exit 1
 
         # if we get here, we can proceed with the install
-        echo "Installing hubflow to $INSTALL_INTO"
+        echo "Installing springflow to $INSTALL_INTO"
         if [ -f "$REPO_DIR/$SUBMODULE_FILE" ] ; then
             echo "Submodules look up to date"
         else

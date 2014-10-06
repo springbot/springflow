@@ -41,22 +41,22 @@
 #
 
 require_git_repo
-require_hubflow_initialized
-hubflow_load_settings
-PREFIX=$(git config --get hubflow.prefix.feature)
+require_springflow_initialized
+springflow_load_settings
+PREFIX=$(git config --get springflow.prefix.feature)
 
 usage() {
-	echo "usage: git hf feature [list] [-v]"
-	echo "       git hf feature start <name> [<base>]"
-	echo "       git hf feature submit [<name>] [<base>]"
-	echo "       git hf feature finish [-rFkD] [<name|nameprefix>]"
-	echo "       git hf feature track <name>"
-	echo "       git hf feature diff [<name|nameprefix>]"
-	echo "       git hf feature rebase [-i] [<name|nameprefix>]"
-	echo "       git hf feature checkout [<name|nameprefix>]"
-	echo "       git hf feature pull [-r] [<remote> [<name>]]"
-	echo "       git hf feature push [<remote> [<name>]]"
-	echo "       git hf feature cancel [-f] <name>"
+	echo "usage: git sf feature [list] [-v]"
+	echo "       git sf feature start <name> [<base>]"
+	echo "       git sf feature submit [<name>] [<base>]"
+	echo "       git sf feature finish [-rFkD] [<name|nameprefix>]"
+	echo "       git sf feature track <name>"
+	echo "       git sf feature diff [<name|nameprefix>]"
+	echo "       git sf feature rebase [-i] [<name|nameprefix>]"
+	echo "       git sf feature checkout [<name|nameprefix>]"
+	echo "       git sf feature pull [-r] [<remote> [<name>]]"
+	echo "       git sf feature push [<remote> [<name>]]"
+	echo "       git sf feature cancel [-f] <name>"
 }
 
 cmd_default() {
@@ -76,7 +76,7 @@ cmd_list() {
 		warn ""
 		warn "You can start a new feature branch:"
 		warn ""
-		warn "    git hf feature start <name> [<base>]"
+		warn "    git sf feature start <name> [<base>]"
 		warn ""
 		exit 0
 	fi
@@ -139,8 +139,8 @@ expand_nameprefix_arg() {
 
 	local expanded_name
 	local exitcode
-    track_repo=$(hubflow_track_repo "$NAME" "$PREFIX" "$ORIGIN")	
-    expanded_name=$(hubflow_resolve_nameprefix "$NAME" "$PREFIX")
+    track_repo=$(springflow_track_repo "$NAME" "$PREFIX" "$ORIGIN")	
+    expanded_name=$(springflow_resolve_nameprefix "$NAME" "$PREFIX")
 	exitcode=$?
 	case $exitcode in
 		0) NAME=$expanded_name
@@ -208,7 +208,7 @@ cmd_start() {
 	require_clean_working_tree
 	require_remote_available
 	if flag fetch ; then
-		hubflow_fetch_latest_changes_from_origin
+		springflow_fetch_latest_changes_from_origin
 	fi
 	require_branch_absent "$ORIGIN/$BRANCH"
 
@@ -224,7 +224,7 @@ cmd_start() {
 	fi
 
 	# push it back up to remote repo
-	hubflow_push_latest_changes_to_origin
+	springflow_push_latest_changes_to_origin
 
 	echo
 	echo "Summary of actions:"
@@ -235,7 +235,7 @@ cmd_start() {
 	echo "Now, start committing on your feature. When done, create a"
 	echo "pull request on GitHub.  Once that has been merged, use:"
 	echo ""
-	echo "     git hf feature finish $NAME"
+	echo "     git sf feature finish $NAME"
 	echo
 }
 
@@ -249,10 +249,10 @@ cmd_submit() {
 	require_clean_working_tree
     require_github_origin_repo
 	require_remote_available
-	hubflow_fetch_latest_changes_from_origin
+	springflow_fetch_latest_changes_from_origin
 
 	# push to origin
-	hubflow_push_latest_changes_to_origin
+	springflow_push_latest_changes_to_origin
 
 	# pull request details
 	PR_FILE="./COMMIT_MSG"
@@ -328,7 +328,7 @@ EOS
 	echo ""
 	echo "Once the Pull Request has been accepted, cleanup the feature with:"
 	echo ""
-	echo "     git hf feature finish $NAME"
+	echo "     git sf feature finish $NAME"
 	echo
 }
 
@@ -349,7 +349,7 @@ cmd_finish() {
 	# update local repo with remote changes first, if asked
 	if flag fetch; then
 		# fetch and merge the latest changes from origin
-		hubflow_merge_latest_changes_from_origin
+		springflow_merge_latest_changes_from_origin
 	fi
 
 	if has "$ORIGIN/$BRANCH" $(git_remote_branches); then
@@ -371,11 +371,11 @@ cmd_finish() {
 
 	# if the user wants to rebase, do that first
 	if flag rebase; then
-		if ! git hf feature rebase "$NAME" "$DEVELOP_BRANCH"; then
+		if ! git sf feature rebase "$NAME" "$DEVELOP_BRANCH"; then
 			warn "Finish was aborted due to conflicts during rebase."
 			warn "Please finish the rebase manually now."
 			warn "When finished, re-run:"
-			warn "    git hf feature finish '$NAME' '$DEVELOP_BRANCH'"
+			warn "    git sf feature finish '$NAME' '$DEVELOP_BRANCH'"
 			exit 1
 		fi
 	fi
@@ -383,7 +383,7 @@ cmd_finish() {
 	# merge into the develop branch
 	# the merge_helper will not return if there is a merge conflict
 	# we want to remain on the DEVELOP_BRANCH after the merge is complete
-	hubflow_local_merge_helper "$BRANCH" "$DEVELOP_BRANCH" no_checkout_afterwards
+	springflow_local_merge_helper "$BRANCH" "$DEVELOP_BRANCH" no_checkout_afterwards
 
 	# make sure the merge worked
 	if [[ $(git rev-list -n2 "$DEVELOP_BRANCH..$BRANCH") ]] ; then
@@ -397,10 +397,10 @@ cmd_finish() {
 	fi
 
 	# switch to the develop branch
-	hubflow_change_branch "$DEVELOP_BRANCH"
+	springflow_change_branch "$DEVELOP_BRANCH"
 
 	# if we merged locally, push those changes up to origin
-	hubflow_push_latest_changes_to_origin
+	springflow_push_latest_changes_to_origin
 
 	# delete the local branch if it is no longer needed
 	if noflag keep; then
@@ -481,18 +481,18 @@ avoid_accidental_cross_branch_action() {
 	local current_branch=$(git_current_branch)
 	if [ "$BRANCH" != "$current_branch" ]; then
 		warn "Trying to pull from '$BRANCH' while currently on branch '$current_branch'."
-		warn "To avoid unintended merges, hubflow aborted."
+		warn "To avoid unintended merges, springflow aborted."
 		return 1
 	fi
 	return 0
 }
 
 cmd_pull() {
-	git hf pull "$@"
+	git sf pull "$@"
 }
 
 cmd_push() {
-	git hf push "$@"
+	git sf push "$@"
 }
 
 cmd_cancel() {

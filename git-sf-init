@@ -41,7 +41,7 @@
 #
 
 usage() {
-	echo "usage: git hf init [-af]"
+	echo "usage: git sf init [-af]"
 }
 
 parse_args() {
@@ -52,7 +52,7 @@ parse_args() {
 
 # Default entry when no SUBACTION is given
 cmd_default() {
-	DEFINE_boolean force false 'force setting of hubflow branches, even if already configured' f
+	DEFINE_boolean force false 'force setting of springflow branches, even if already configured' f
 	DEFINE_boolean ask false 'ask for branch naming conventions' a
 	parse_args "$@"
 
@@ -63,10 +63,10 @@ cmd_default() {
 		git_repo_is_headless || require_clean_working_tree
 	fi
 
-	# running git hf init on an already initialized repo is fine
-	if hubflow_is_initialized && ! flag force; then
-		warn "Already initialized for hubflow."
-		warn "To force reinitialization, use: git hf init -f"
+	# running git sf init on an already initialized repo is fine
+	if springflow_is_initialized && ! flag force; then
+		warn "Already initialized for springflow."
+		warn "To force reinitialization, use: git sf init -f"
 		exit 0
 	fi
 
@@ -79,22 +79,22 @@ cmd_default() {
 
 	# add a master branch if no such branch exists yet
 	local master_branch
-	if hubflow_has_master_configured && ! flag force; then
-		master_branch=$(git config --get hubflow.branch.master)
+	if springflow_has_master_configured && ! flag force; then
+		master_branch=$(git config --get springflow.branch.master)
 	else
 		# Two cases are distinguished:
 		# 1. A fresh git repo (without any branches)
 		#    We will create a new master/develop branch for the user
 		# 2. Some branches do already exist
 		#    We will disallow creation of new master/develop branches and
-		#    rather allow to use existing branches for hubflow.
+		#    rather allow to use existing branches for springflow.
 		local default_suggestion
 		local should_check_existence
 		branch_count=$(git_local_branches | wc -l)
 		if [ "$branch_count" -eq 0 ]; then
 			echo "No branches exist yet. Base branches must be created now."
 			should_check_existence=NO
-			default_suggestion=$(git config --get hubflow.branch.master || echo deploy)
+			default_suggestion=$(git config --get springflow.branch.master || echo deploy)
 		else
 			echo
 			echo "Which branch should be used for cutting production releases?"
@@ -102,7 +102,7 @@ cmd_default() {
 
 			should_check_existence=YES
 			default_suggestion=
-			for guess in $(git config --get hubflow.branch.master) 'deploy'; do
+			for guess in $(git config --get springflow.branch.master) 'deploy'; do
 				if git_local_branch_exists "$guess"; then
 					default_suggestion="$guess"
 					break
@@ -110,7 +110,7 @@ cmd_default() {
 			done
 
 			if [ -z "$default_suggestion" ] ; then
-				for guess in $(git config --get hubflow.branch.master) 'deploy'; do
+				for guess in $(git config --get springflow.branch.master) 'deploy'; do
 					if git_remote_branch_exists "origin/$guess"; then
 						default_suggestion="$guess"
 						break
@@ -146,13 +146,13 @@ cmd_default() {
 		fi
 
 		# store the name of the master branch
-		git config hubflow.branch.master "$master_branch"
+		git config springflow.branch.master "$master_branch"
 	fi
 
 	# add a develop branch if no such branch exists yet
 	local develop_branch
-	if hubflow_has_develop_configured && ! flag force; then
-		develop_branch=$(git config --get hubflow.branch.develop)
+	if springflow_has_develop_configured && ! flag force; then
+		develop_branch=$(git config --get springflow.branch.develop)
 	else
 		# Again, the same two cases as with the master selection are
 		# considered (fresh repo or repo that contains branches)
@@ -161,7 +161,7 @@ cmd_default() {
 		branch_count=$(git_local_branches | grep -v "^${master_branch}\$" | wc -l)
 		if [ "$branch_count" -eq 0 ]; then
 			should_check_existence=NO
-			default_suggestion=$(git config --get hubflow.branch.develop || echo master)
+			default_suggestion=$(git config --get springflow.branch.develop || echo master)
 		else
 			echo
 			echo "Which branch should be used for active development of the \"next release\"?"
@@ -169,7 +169,7 @@ cmd_default() {
 
 			should_check_existence=YES
 			default_suggestion=
-			for guess in $(git config --get hubflow.branch.develop) 'master'; do
+			for guess in $(git config --get springflow.branch.develop) 'master'; do
 				if git_local_branch_exists "$guess"; then
 					default_suggestion="$guess"
 					break
@@ -177,7 +177,7 @@ cmd_default() {
 			done
 
 			if [ -z "$default_suggestion" ]; then
-				for guess in $(git config --get hubflow.branch.develop) 'master'; do
+				for guess in $(git config --get springflow.branch.develop) 'master'; do
 					if git_remote_branch_exists "origin/$guess"; then
 						default_suggestion="$guess"
 						break
@@ -205,18 +205,18 @@ cmd_default() {
 		fi
 
 		# store the name of the develop branch
-		git config hubflow.branch.develop "$develop_branch"
+		git config springflow.branch.develop "$develop_branch"
 	fi
 
 	# Creation of HEAD
 	# ----------------
 	# We create a HEAD now, if it does not exist yet (in a fresh repo). We need
 	# it to be able to create new branches.
-	local created_hubflow_branch=0
+	local created_springflow_branch=0
 	if ! git rev-parse --quiet --verify HEAD >/dev/null 2>&1; then
 		git symbolic-ref HEAD "refs/heads/$master_branch"
 		git commit --allow-empty --quiet -m "Initial commit"
-		created_hubflow_branch=1
+		created_springflow_branch=1
 	fi
 
 	# Creation of master
@@ -230,7 +230,7 @@ cmd_default() {
 		else
 			git branch --no-track "$master_branch"
 		fi
-		created_hubflow_branch=1
+		created_springflow_branch=1
 	fi
 
 	# Creation of develop
@@ -245,24 +245,24 @@ cmd_default() {
 		else
 			git branch --no-track "$develop_branch" "$master_branch"
 		fi
-		created_hubflow_branch=1
+		created_springflow_branch=1
 	fi
 
-	# assert the hubflow repo has been correctly initialized
-	hubflow_is_initialized
+	# assert the springflow repo has been correctly initialized
+	springflow_is_initialized
 
 	# switch to develop branch if its newly created
-	if [ $created_hubflow_branch -eq 1 ]; then
+	if [ $created_springflow_branch -eq 1 ]; then
 		git checkout -q "$develop_branch"
 	fi
 
 	# finally, ask the user for naming conventions (branch and tag prefixes)
 	if flag force || \
-	   ! git config --get hubflow.prefix.feature >/dev/null 2>&1 ||
-	   ! git config --get hubflow.prefix.release >/dev/null 2>&1 ||
-	   ! git config --get hubflow.prefix.hotfix >/dev/null 2>&1 ||
-	   ! git config --get hubflow.prefix.support >/dev/null 2>&1 ||
-	   ! git config --get hubflow.prefix.versiontag >/dev/null 2>&1; then
+	   ! git config --get springflow.prefix.feature >/dev/null 2>&1 ||
+	   ! git config --get springflow.prefix.release >/dev/null 2>&1 ||
+	   ! git config --get springflow.prefix.hotfix >/dev/null 2>&1 ||
+	   ! git config --get springflow.prefix.support >/dev/null 2>&1 ||
+	   ! git config --get springflow.prefix.versiontag >/dev/null 2>&1; then
 		echo
 		echo "How to name your supporting branch prefixes?"
 	fi
@@ -270,8 +270,8 @@ cmd_default() {
 	local prefix
 
 	# Feature branches
-	if ! git config --get hubflow.prefix.feature >/dev/null 2>&1 || flag force; then
-		default_suggestion=$(git config --get hubflow.prefix.feature || echo WWW-)
+	if ! git config --get springflow.prefix.feature >/dev/null 2>&1 || flag force; then
+		default_suggestion=$(git config --get springflow.prefix.feature || echo WWW-)
 		printf "Feature branches? [$default_suggestion] "
 		if flag ask; then
 			read answer
@@ -279,12 +279,12 @@ cmd_default() {
 			printf "\n"
 		fi
 		[ "$answer" = "-" ] && prefix= || prefix=${answer:-$default_suggestion}
-		git config hubflow.prefix.feature "$prefix"
+		git config springflow.prefix.feature "$prefix"
 	fi
 
 	# Release branches
-	if ! git config --get hubflow.prefix.release >/dev/null 2>&1 || flag force; then
-		default_suggestion=$(git config --get hubflow.prefix.release || echo release/)
+	if ! git config --get springflow.prefix.release >/dev/null 2>&1 || flag force; then
+		default_suggestion=$(git config --get springflow.prefix.release || echo release/)
 		printf "Release branches? [$default_suggestion] "
 		if flag ask; then
 			read answer
@@ -292,13 +292,13 @@ cmd_default() {
 			printf "\n"
 		fi
 		[ "$answer" = "-" ] && prefix= || prefix=${answer:-$default_suggestion}
-		git config hubflow.prefix.release "$prefix"
+		git config springflow.prefix.release "$prefix"
 	fi
 
 
 	# Hotfix branches
-	if ! git config --get hubflow.prefix.hotfix >/dev/null 2>&1 || flag force; then
-		default_suggestion=$(git config --get hubflow.prefix.hotfix || echo hotfix/)
+	if ! git config --get springflow.prefix.hotfix >/dev/null 2>&1 || flag force; then
+		default_suggestion=$(git config --get springflow.prefix.hotfix || echo hotfix/)
 		printf "Hotfix branches? [$default_suggestion] "
 		if flag ask; then
 			read answer
@@ -306,13 +306,13 @@ cmd_default() {
 			printf "\n"
 		fi
 		[ "$answer" = "-" ] && prefix= || prefix=${answer:-$default_suggestion}
-		git config hubflow.prefix.hotfix "$prefix"
+		git config springflow.prefix.hotfix "$prefix"
 	fi
 
 
 	# Support branches
-	if ! git config --get hubflow.prefix.support >/dev/null 2>&1 || flag force; then
-		default_suggestion=$(git config --get hubflow.prefix.support || echo support/)
+	if ! git config --get springflow.prefix.support >/dev/null 2>&1 || flag force; then
+		default_suggestion=$(git config --get springflow.prefix.support || echo support/)
 		printf "Support branches? [$default_suggestion] "
 		if flag ask; then
 			read answer
@@ -320,13 +320,13 @@ cmd_default() {
 			printf "\n"
 		fi
 		[ "$answer" = "-" ] && prefix= || prefix=${answer:-$default_suggestion}
-		git config hubflow.prefix.support "$prefix"
+		git config springflow.prefix.support "$prefix"
 	fi
 
 
 	# Version tag prefix
-	if ! git config --get hubflow.prefix.versiontag >/dev/null 2>&1 || flag force; then
-		default_suggestion=$(git config --get hubflow.prefix.versiontag || echo "r")
+	if ! git config --get springflow.prefix.versiontag >/dev/null 2>&1 || flag force; then
+		default_suggestion=$(git config --get springflow.prefix.versiontag || echo "r")
 		printf "Version tag prefix? [$default_suggestion] "
 		if flag ask; then
 			read answer
@@ -334,7 +334,7 @@ cmd_default() {
 			printf "\n"
 		fi
 		[ "$answer" = "-" ] && prefix= || prefix=${answer:-$default_suggestion}
-		git config hubflow.prefix.versiontag "$prefix"
+		git config springflow.prefix.versiontag "$prefix"
 	fi
 
 	# at this point, we should be on the develop branch, which may or
@@ -342,9 +342,9 @@ cmd_default() {
 	#
         # Load the settings that were just written so that $ORIGIN,
 	# etc. are properly defined
-        hubflow_load_settings
+        springflow_load_settings
 	# push up to origin, in case this branch does not exist there (yet)
-	hubflow_push_latest_changes_to_origin
+	springflow_push_latest_changes_to_origin
 }
 
 cmd_help() {

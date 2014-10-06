@@ -44,8 +44,8 @@
 # Common variables
 #
 
-HUBFLOW_VERSION=1.5.4
-HUBFLOW_REPO=https://github.com/springbot/hubflow
+SPRINGFLOW_VERSION=1.5.3
+SPRINGFLOW_REPO=https://github.com/springbot/springflow
 
 #
 # Common functionality
@@ -170,46 +170,46 @@ git_is_branch_merged_into() {
 }
 
 #
-# hubflow specific common functionality
+# springflow specific common functionality
 #
 
-# check if this repo has been inited for hubflow
-hubflow_has_master_configured() {
-	local master=$(git config --get hubflow.branch.master)
+# check if this repo has been inited for springflow
+springflow_has_master_configured() {
+	local master=$(git config --get springflow.branch.master)
 	[ "$master" != "" ] && git_local_branch_exists "$master"
 }
 
-hubflow_has_develop_configured() {
-	local develop=$(git config --get hubflow.branch.develop)
+springflow_has_develop_configured() {
+	local develop=$(git config --get springflow.branch.develop)
 	[ "$develop" != "" ] && git_local_branch_exists "$develop"
 }
 
-hubflow_has_prefixes_configured() {
-	git config --get hubflow.prefix.feature >/dev/null 2>&1     && \
-	git config --get hubflow.prefix.release >/dev/null 2>&1     && \
-	git config --get hubflow.prefix.hotfix >/dev/null 2>&1      && \
-	git config --get hubflow.prefix.support >/dev/null 2>&1     && \
-	git config --get hubflow.prefix.versiontag >/dev/null 2>&1
+springflow_has_prefixes_configured() {
+	git config --get springflow.prefix.feature >/dev/null 2>&1     && \
+	git config --get springflow.prefix.release >/dev/null 2>&1     && \
+	git config --get springflow.prefix.hotfix >/dev/null 2>&1      && \
+	git config --get springflow.prefix.support >/dev/null 2>&1     && \
+	git config --get springflow.prefix.versiontag >/dev/null 2>&1
 }
 
-hubflow_is_initialized() {
-	hubflow_has_master_configured                    && \
-	hubflow_has_develop_configured                   && \
-	[ "$(git config --get hubflow.branch.master)" !=    \
-	  "$(git config --get hubflow.branch.develop)" ] && \
-	hubflow_has_prefixes_configured
+springflow_is_initialized() {
+	springflow_has_master_configured                    && \
+	springflow_has_develop_configured                   && \
+	[ "$(git config --get springflow.branch.master)" !=    \
+	  "$(git config --get springflow.branch.develop)" ] && \
+	springflow_has_prefixes_configured
 }
 
 # loading settings that can be overridden using git config
-hubflow_load_settings() {
+springflow_load_settings() {
 	export DOT_GIT_DIR=$(git rev-parse --git-dir 2>/dev/null)
-	export MASTER_BRANCH=$(git config --get hubflow.branch.master)
-	export DEVELOP_BRANCH=$(git config --get hubflow.branch.develop)
-	export ORIGIN=$(git config --get hubflow.origin || echo origin)
+	export MASTER_BRANCH=$(git config --get springflow.branch.master)
+	export DEVELOP_BRANCH=$(git config --get springflow.branch.develop)
+	export ORIGIN=$(git config --get springflow.origin || echo origin)
     export BRANCH=$(git_current_branch)
 }
 
-hubflow_change_branch() {
+springflow_change_branch() {
     # what is the current branch?
     local current_branch=$(git_current_branch)
 
@@ -219,7 +219,7 @@ hubflow_change_branch() {
     fi
 }
 
-hubflow_branch_push() {
+springflow_branch_push() {
     # make sure we have a stack to push onto
     if [[ -z BRANCH_STACK ]] ; then
         BRANCH_STACK=()
@@ -231,14 +231,14 @@ hubflow_branch_push() {
     let "BRANCH_STACK_SP += 1"
 
     # do we need to switch branch too?
-    hubflow_change_branch "$1"
+    springflow_change_branch "$1"
 }
 
-hubflow_branch_push_current_branch() {
-    hubflow_branch_push "$(git_current_branch)"
+springflow_branch_push_current_branch() {
+    springflow_branch_push "$(git_current_branch)"
 }
 
-hubflow_branch_pop() {
+springflow_branch_pop() {
     # make sure we have a stack to pop from
     [[ -n $BRANCH_STACK ]] || die "Internal error: attempt to pop from non-existent BRANCH_STACK"
 
@@ -251,10 +251,10 @@ hubflow_branch_pop() {
     let "BRANCH_STACK_SP -= 1"
 
     # do we need to switch branch too?
-    hubflow_change_branch "$popped_branch"
+    springflow_change_branch "$popped_branch"
 }
 
-hubflow_branch_pop_no_checkout() {
+springflow_branch_pop_no_checkout() {
     # make sure we have a stack to pop from
     [[ -n $BRANCH_STACK ]] || die "Internal error: attempt to pop from non-existent BRANCH_STACK"
 
@@ -269,7 +269,7 @@ hubflow_branch_pop_no_checkout() {
 # $1: origin
 # $2: branch to merge into
 # $3: 'no_checkout_afterwards' if we do not want to checkout the current branch after the merge
-hubflow_remote_merge_helper() {
+springflow_remote_merge_helper() {
     # is there anything to merge?
     git_compare_branches "$2" "$1/$2"
     if [[ $? -eq 0 ]] ; then
@@ -277,7 +277,7 @@ hubflow_remote_merge_helper() {
     fi
 
     # switch to the right branch locally
-    hubflow_branch_push "$2"
+    springflow_branch_push "$2"
 
     # merge from origin
     # do not pull, as we will already have a local copy of the branch
@@ -304,16 +304,16 @@ hubflow_remote_merge_helper() {
 
     # switch back to the original branch
     if [[ -z $3 || $3 != 'no_checkout_afterwards' ]] ; then
-        hubflow_branch_pop
+        springflow_branch_pop
     else
-        hubflow_branch_pop_no_checkout
+        springflow_branch_pop_no_checkout
     fi
 }
 
 # $1: local branch to merge from
 # $2: local branch to merge to
 # $3: 'no_checkout_afterwards' if we do not want to checkout the current branch after the merge
-hubflow_local_merge_helper() {
+springflow_local_merge_helper() {
     # is there anything to merge?
     git_compare_branches "$1" "$2"
     if [[ $? -eq 0 ]] ; then
@@ -321,7 +321,7 @@ hubflow_local_merge_helper() {
     fi
 
     # switch to the right branch locally
-    hubflow_branch_push "$2"
+    springflow_branch_push "$2"
 
     # merge into branch
     if [ "$(git rev-list -n2 "$2..$1" | wc -l)" -eq 1 ]; then
@@ -347,29 +347,29 @@ hubflow_local_merge_helper() {
 
     # switch back to the original branch
     if [[ -z $3 || $3 != 'no_checkout_afterwards' ]] ; then
-        hubflow_branch_pop
+        springflow_branch_pop
     else
-        hubflow_branch_pop_no_checkout
+        springflow_branch_pop_no_checkout
     fi
 }
 
-hubflow_fetch_latest_changes_from_origin() {
+springflow_fetch_latest_changes_from_origin() {
     git remote update "$ORIGIN" || die "Unable to get list of latest changes from '$ORIGIN'"
     git fetch "$ORIGIN" || die "Unable to fetch latest changes from '$ORIGIN'"
     git fetch --tags  || die "Unable to fetch latest tags from '$ORIGIN'"
 }
 
-hubflow_merge_latest_changes_from_origin() {
+springflow_merge_latest_changes_from_origin() {
     # we need to fetch the latest changes from upstream, before we can merge
-    hubflow_fetch_latest_changes_from_origin
+    springflow_fetch_latest_changes_from_origin
 
     # remember which branch is currently checked out
-    hubflow_branch_push_current_branch
+    springflow_branch_push_current_branch
 
     # merge the master branch first
     # merge conflicts on master will be rare
     if has "$ORIGIN/$MASTER_BRANCH" $(git_remote_branches); then
-        hubflow_remote_merge_helper "$ORIGIN" "$MASTER_BRANCH" no_checkout_afterwards
+        springflow_remote_merge_helper "$ORIGIN" "$MASTER_BRANCH" no_checkout_afterwards
         git_compare_branches "$MASTER_BRANCH" "$ORIGIN/$MASTER_BRANCH"
         if [[ $? -ne 0 ]] ; then
             git push "$ORIGIN" "$MASTER_BRANCH" || die "Push to '$ORIGIN' failed"
@@ -379,7 +379,7 @@ hubflow_merge_latest_changes_from_origin() {
     # merge the develop branch next
     # merge conflicts on develop are sadly more common
     if has "$ORIGIN/$DEVELOP_BRANCH" $(git_remote_branches); then
-        hubflow_remote_merge_helper "$ORIGIN" "$DEVELOP_BRANCH" no_checkout_afterwards
+        springflow_remote_merge_helper "$ORIGIN" "$DEVELOP_BRANCH" no_checkout_afterwards
         git_compare_branches "$DEVELOP_BRANCH" "$ORIGIN/$DEVELOP_BRANCH"
         if [[ $? -ne 0 ]] ; then
             git push "$ORIGIN" "$DEVELOP_BRANCH" || die "Push to '$ORIGIN' failed"
@@ -387,11 +387,11 @@ hubflow_merge_latest_changes_from_origin() {
     fi
 
     # switch back to the original branch
-    hubflow_branch_pop
+    springflow_branch_pop
 }
 
 # $1: 'force' if push should overwrite existing origin contents
-hubflow_push_latest_changes_to_origin() {
+springflow_push_latest_changes_to_origin() {
     local current_branch=$(git_current_branch)
 
     if ! git_branch_exists "$ORIGIN/$current_branch" ; then
@@ -424,17 +424,17 @@ hubflow_push_latest_changes_to_origin() {
     return 0
 }
 
-hubflow_get_latest_version_number() {
-	LATEST="`git ls-remote --tags https://github.com/datasift/gitflow | grep -v '\^' | tail -n 1 | cut -d / -f 3`"
+springflow_get_latest_version_number() {
+	LATEST="`git ls-remote --tags https://github.com/springbot/springflow | grep -v '\^' | tail -n 1 | cut -d / -f 3`"
 
 	echo $LATEST
 }
 
-hubflow_has_new_version_available() {
-	LATEST=`hubflow_get_latest_version_number`
-	if [[ $LATEST != $HUBFLOW_VERSION ]] ; then
+springflow_has_new_version_available() {
+	LATEST=`springflow_get_latest_version_number`
+	if [[ $LATEST != $SPRINGFLOW_VERSION ]] ; then
 		echo "A new version of the HubFlow tools is available."
-		echo "To upgrade, run 'git hf upgrade'."
+		echo "To upgrade, run 'git sf upgrade'."
 		echo
 		return 0
 	fi
@@ -444,7 +444,7 @@ hubflow_has_new_version_available() {
 }
 
 #
-# hubflow_track_repo
+# springflow_track_repo
 #
 # Inputs:
 # $1 = name prefix to resolve
@@ -455,7 +455,7 @@ hubflow_has_new_version_available() {
 # you must tell git to track it in your local config
 # This script will take care of that
 #
-hubflow_track_repo(){
+springflow_track_repo(){
     local name=$1
     local prefix=$2
     local origin=$3
@@ -477,7 +477,7 @@ return 0
 
 
 #
-# hubflow_resolve_nameprefix
+# springflow_resolve_nameprefix
 #
 # Inputs:
 # $1 = name prefix to resolve
@@ -492,7 +492,7 @@ return 0
 # 1: No match is found.
 # 2: Multiple matches found. These matches are written to stderr
 #
-hubflow_resolve_nameprefix() {
+springflow_resolve_nameprefix() {
 	local name=$1
 	local prefix=$2
 	local matches
@@ -621,9 +621,9 @@ require_remote_available() {
 	fi
 }
 
-require_hubflow_initialized() {
-	if ! hubflow_is_initialized; then
-		die "fatal: Not a hubflow-enabled repo yet. Please run \"git hf init\" first."
+require_springflow_initialized() {
+	if ! springflow_is_initialized; then
+		die "fatal: Not a springflow-enabled repo yet. Please run \"git sf init\" first."
 	fi
 }
 
