@@ -53,7 +53,7 @@ parse_args() {
 # Default entry when no SUBACTION is given
 cmd_default() {
 	DEFINE_boolean force false 'force setting of hubflow branches, even if already configured' f
-	DEFINE_boolean ask true 'ask for branch naming conventions' a
+	DEFINE_boolean ask false 'ask for branch naming conventions' a
 	parse_args "$@"
 
 	if ! git rev-parse --git-dir >/dev/null 2>&1; then
@@ -97,7 +97,7 @@ cmd_default() {
 			default_suggestion=$(git config --get hubflow.branch.master || echo deploy)
 		else
 			echo
-			echo "Which branch should be used for tracking production releases?"
+			echo "Which branch should be used for cutting production releases?"
 			git_local_branches | sed 's/^.*$/   - &/g'
 
 			should_check_existence=YES
@@ -164,7 +164,7 @@ cmd_default() {
 			default_suggestion=$(git config --get hubflow.branch.develop || echo master)
 		else
 			echo
-			echo "Which branch should be used for integration of the \"next release\"?"
+			echo "Which branch should be used for active development of the \"next release\"?"
 			git_local_branches | grep -v "^${master_branch}\$" | sed 's/^.*$/   - &/g'
 
 			should_check_existence=YES
