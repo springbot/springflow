@@ -53,7 +53,7 @@ parse_args() {
 # Default entry when no SUBACTION is given
 cmd_default() {
 	DEFINE_boolean force false 'force setting of hubflow branches, even if already configured' f
-	DEFINE_boolean ask false 'ask for branch naming conventions' a
+	DEFINE_boolean ask true 'ask for branch naming conventions' a
 	parse_args "$@"
 
 	if ! git rev-parse --git-dir >/dev/null 2>&1; then
@@ -94,7 +94,7 @@ cmd_default() {
 		if [ "$branch_count" -eq 0 ]; then
 			echo "No branches exist yet. Base branches must be created now."
 			should_check_existence=NO
-			default_suggestion=$(git config --get hubflow.branch.master || echo master)
+			default_suggestion=$(git config --get hubflow.branch.master || echo deploy)
 		else
 			echo
 			echo "Which branch should be used for tracking production releases?"
@@ -102,8 +102,7 @@ cmd_default() {
 
 			should_check_existence=YES
 			default_suggestion=
-			for guess in $(git config --get hubflow.branch.master) \
-			             'production' 'main' 'master'; do
+			for guess in $(git config --get hubflow.branch.master) 'deploy'; do
 				if git_local_branch_exists "$guess"; then
 					default_suggestion="$guess"
 					break
@@ -111,8 +110,7 @@ cmd_default() {
 			done
 
 			if [ -z "$default_suggestion" ] ; then
-				for guess in $(git config --get hubflow.branch.master) \
-				             'production' 'main' 'master'; do
+				for guess in $(git config --get hubflow.branch.master) 'deploy'; do
 					if git_remote_branch_exists "origin/$guess"; then
 						default_suggestion="$guess"
 						break
@@ -120,9 +118,9 @@ cmd_default() {
 				done
 			fi
 
-			# if we have no default at this point, use 'master'
+			# if we have no default at this point, use 'deploy'
 			if [ -z "$default_suggestion" ] ; then
-				default_suggestion="master"
+				default_suggestion="deploy"
 				should_check_existence="NO"
 			fi
 		fi
@@ -163,7 +161,7 @@ cmd_default() {
 		branch_count=$(git_local_branches | grep -v "^${master_branch}\$" | wc -l)
 		if [ "$branch_count" -eq 0 ]; then
 			should_check_existence=NO
-			default_suggestion=$(git config --get hubflow.branch.develop || echo develop)
+			default_suggestion=$(git config --get hubflow.branch.develop || echo master)
 		else
 			echo
 			echo "Which branch should be used for integration of the \"next release\"?"
@@ -171,8 +169,7 @@ cmd_default() {
 
 			should_check_existence=YES
 			default_suggestion=
-			for guess in $(git config --get hubflow.branch.develop) \
-			             'develop' 'int' 'integration' 'master'; do
+			for guess in $(git config --get hubflow.branch.develop) 'master'; do
 				if git_local_branch_exists "$guess"; then
 					default_suggestion="$guess"
 					break
@@ -180,8 +177,7 @@ cmd_default() {
 			done
 
 			if [ -z "$default_suggestion" ]; then
-				for guess in $(git config --get hubflow.branch.develop) \
-				             'develop' 'int' 'integration' 'master'; do
+				for guess in $(git config --get hubflow.branch.develop) 'master'; do
 					if git_remote_branch_exists "origin/$guess"; then
 						default_suggestion="$guess"
 						break
@@ -275,7 +271,7 @@ cmd_default() {
 
 	# Feature branches
 	if ! git config --get hubflow.prefix.feature >/dev/null 2>&1 || flag force; then
-		default_suggestion=$(git config --get hubflow.prefix.feature || echo feature/)
+		default_suggestion=$(git config --get hubflow.prefix.feature || echo WWW-)
 		printf "Feature branches? [$default_suggestion] "
 		if flag ask; then
 			read answer
@@ -330,7 +326,7 @@ cmd_default() {
 
 	# Version tag prefix
 	if ! git config --get hubflow.prefix.versiontag >/dev/null 2>&1 || flag force; then
-		default_suggestion=$(git config --get hubflow.prefix.versiontag || echo "")
+		default_suggestion=$(git config --get hubflow.prefix.versiontag || echo "r")
 		printf "Version tag prefix? [$default_suggestion] "
 		if flag ask; then
 			read answer
