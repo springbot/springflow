@@ -44,7 +44,7 @@
 # Common variables
 #
 
-SPRINGFLOW_VERSION=1.5.3
+SPRINGFLOW_VERSION=1.5.4
 SPRINGFLOW_REPO=https://github.com/springbot/springflow
 
 #
