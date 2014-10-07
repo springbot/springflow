@@ -1,4 +1,4 @@
-HubFlow
+SpringFlow
 =======
 
 Adds the 'git sf' Git extension to provide high-level repository operations
