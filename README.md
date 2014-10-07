@@ -31,7 +31,7 @@ Now make some commits on your feature branch. You can push and share your branch
 
 Stay up to date with `git sf update`. This will pull in changes on your feature branch from the remote, as well as `master`. To get up to date with `master`, do the usual `git merge master` or better, `git rebase master`.
 
-Open a Pull Request on GitHub when you're ready to bring your feauture into master. Once the Pull Request has been merged, you can clean up your branch with `git sf feature finish`.
+Open a Pull Request on GitHub when you're ready to bring your feature into master. Once the Pull Request has been merged, you can clean up your branch with `git sf feature finish`.
 
 Cut a Release
 -------------
