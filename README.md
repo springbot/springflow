@@ -2,7 +2,7 @@ SpringFlow
 =======
 
 Adds the 'git sf' Git extension to provide high-level repository operations
-for [DataSift's HubFlow branching model](http://datasift.github.com/gitflow/), which is based on [Vincent Driessen’s original blog post](http://nvie.com/posts/a-successful-git-branching-model/).
+for [DataSift's SpringFlow branching model](http://datasift.github.com/gitflow/), which is based on [Vincent Driessen’s original blog post](http://nvie.com/posts/a-successful-git-branching-model/).
 
 Installation
 ------------
@@ -14,7 +14,7 @@ Installation
 Upgrading To The Latest Version
 -------------------------------
 
-Upgrading to the latest version of the HubFlow tools is very easy:
+Upgrading to the latest version of the SpringFlow tools is very easy:
 
 1. `git sf upgrade`
 
@@ -47,7 +47,7 @@ Further Reading
 ---------------
 SpringFlow is based on HubFlow, which itself is based on GitFlow. You might find it helpful to read up on those projects for background.
 
-See our tutorial website to learn more about the [GitFlow](http://datasift.github.com/gitflow/IntroducingGitFlow.html) branching model and [how to use the HubFlow tools](http://datasift.github.com/gitflow/GitFlowForGitHub.html).
+See our tutorial website to learn more about the [GitFlow](http://datasift.github.com/gitflow/IntroducingGitFlow.html) branching model and [how to use the SpringFlow tools](http://datasift.github.com/gitflow/GitFlowForGitHub.html).
 
 Changelog
 ---------
@@ -56,7 +56,7 @@ To see what's new in each release, see our [Changelog](http://datasift.github.co
 
 License Terms
 -------------
-HubFlow is published under the liberal terms of the BSD License, see the
+SpringFlow is published under the liberal terms of the BSD License, see the
 [LICENSE](LICENSE) file. Although the BSD License does not require you to share
 any modifications you make to the source code, you are very much encouraged and
 invited to contribute back your modifications to the community, preferably

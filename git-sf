@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
-# HubFlow - a fork of the git-flow tools to apply Vincent Driessen's
+# SpringFlow - a fork of the git-flow tools to apply Vincent Driessen's
 # branching model to working with GitHub
 #
 # Original blog post presenting this model is found at:
 #    http://nvie.com/git-model
 #
-# The HubFlow documentation is found at:
+# The SpringFlow documentation is found at:
 #    http://datasift.github.com/gitflow/
 #
 # Feel free to contribute to this project at:

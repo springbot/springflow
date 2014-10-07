@@ -1,11 +1,11 @@
 #
-# HubFlow - a fork of the git-flow tools to apply Vincent Driessen's
+# SpringFlow - a fork of the git-flow tools to apply Vincent Driessen's
 # branching model to working with GitHub
 #
 # Original blog post presenting this model is found at:
 #    http://nvie.com/git-model
 #
-# The HubFlow documentation is found at:
+# The SpringFlow documentation is found at:
 #    http://datasift.github.com/gitflow/
 #
 # Feel free to contribute to this project at:
@@ -298,7 +298,7 @@ springflow_remote_merge_helper() {
         echo
         echo "    git push '$1' '$2'"
         echo
-        echo "After you have pushed back to '$1', please retry your HubFlow command"
+        echo "After you have pushed back to '$1', please retry your SpringFlow command"
         exit 1
     fi
 
@@ -341,7 +341,7 @@ springflow_local_merge_helper() {
         echo "    git mergetool"
         echo "    git commit"
         echo
-        echo "After you have resolved all merge conflicts, please retry your HubFlow command"
+        echo "After you have resolved all merge conflicts, please retry your SpringFlow command"
         exit 1
     fi
 
@@ -433,7 +433,7 @@ springflow_get_latest_version_number() {
 springflow_has_new_version_available() {
 	LATEST=`springflow_get_latest_version_number`
 	if [[ $LATEST != $SPRINGFLOW_VERSION ]] ; then
-		echo "A new version of the HubFlow tools is available."
+		echo "A new version of the SpringFlow tools is available."
 		echo "To upgrade, run 'git sf upgrade'."
 		echo
 		return 0

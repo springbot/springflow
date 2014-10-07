@@ -1,11 +1,11 @@
 #
-# HubFlow - a fork of the git-flow tools to apply Vincent Driessen's
+# SpringFlow - a fork of the git-flow tools to apply Vincent Driessen's
 # branching model to working with GitHub
 #
 # Original blog post presenting this model is found at:
 #    http://nvie.com/git-model
 #
-# The HubFlow documentation is found at:
+# The SpringFlow documentation is found at:
 #    http://datasift.github.com/gitflow/
 #
 # Feel free to contribute to this project at:
@@ -60,15 +60,15 @@ cmd_upgrade() {
 	if ! springflow_has_new_version_available > /dev/null ; then
 		die "You are already running the latest version"
 	elif flag check ; then
-		die "A newer version of the HubFlow tools is available"
+		die "A newer version of the SpringFlow tools is available"
 	fi
 
 	# make sure there isn't already a gitflow folder here
 	if [ -e gitflow ] ; then
-		die "Cannot clone the HubFlow repo; there's already a folder called 'gitflow' in your current working directory"
+		die "Cannot clone the SpringFlow repo; there's already a folder called 'gitflow' in your current working directory"
 	fi
 
-	git clone --recursive $SPRINGFLOW_REPO || die "Unable to clone the HubFlow repo"
+	git clone --recursive $SPRINGFLOW_REPO || die "Unable to clone the SpringFlow repo"
 	cd springflow || die "Could not find the gitflow repo we've just cloned"
 	./install.sh || die "Failed to install gitflow"
 	cd ..
@@ -76,6 +76,6 @@ cmd_upgrade() {
 
 	echo
 	echo "Summary of actions:"
-	echo "- A new version of the HubFlow tools has been installed"
+	echo "- A new version of the SpringFlow tools has been installed"
 	echo
 }
