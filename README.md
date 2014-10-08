@@ -24,7 +24,7 @@ Initialize Your Repo
 
 Develop a Feature
 ---------------
-Using a JIRA ticket number, e.g., JIAR-3547:
+Using a JIRA ticket number, e.g., WWW-3547:
 `git sf feature start 3547`
 
 Now make some commits on your feature branch. You can push and share your branch with `git sf push`
