@@ -72,6 +72,9 @@ cmd_update() {
 	# make sure we're okay to start
 	require_clean_working_tree
 
+  # stop the githerp
+  springflow_tag_purge
+
 	# fetch and merge the latest changes from origin
 	springflow_merge_latest_changes_from_origin
 
@@ -88,6 +91,7 @@ cmd_update() {
 	# all done
 	echo
 	echo "Summary of actions:"
+	echo "- Deleted rogue tags - Stop the GitHerp!"
 	echo "- Any changes to branches at $ORIGIN have been downloaded to your local repository"
 	if flag prune ; then
 		echo "- Any branches that have been deleted at $ORIGIN have also been deleted from your local repository"
