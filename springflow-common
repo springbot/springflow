@@ -530,7 +530,8 @@ springflow_resolve_nameprefix() {
 #
 springflow_tag_purge() {
   git tag -d r2014/10-27 rr2014-10-13d r2014-11-12k-1 r2014-11-12k-2 r2014-11-26d1 whatever 2> /dev/null
-  git push origin :refs/tags/r2014/10-27 :refs/tags/rr2014-10-13d :refs/tags/r2014-11-12k-1 :refs/tags/r2014-11-12k-2 :refs/tags/r2014-11-26d1 :refs/tags/whatever 2> /dev/null
+  # disabling deleting remote tags 'cause I think we have it under control
+  # git push origin :refs/tags/r2014/10-27 :refs/tags/rr2014-10-13d :refs/tags/r2014-11-12k-1 :refs/tags/r2014-11-12k-2 :refs/tags/r2014-11-26d1 :refs/tags/whatever 2> /dev/null
 }
 
 #
