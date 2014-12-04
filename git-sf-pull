@@ -72,6 +72,9 @@ cmd_pull() {
     # make sure we're okay to start
     require_clean_working_tree
 
+    # stop the githerp
+    springflow_tag_purge
+
     # we need to fetch the latest changes from upstream, before we can merge
     springflow_fetch_latest_changes_from_origin
 
@@ -91,5 +94,6 @@ cmd_pull() {
     # all done
     echo
     echo "Summary of actions:"
+    echo "- Deleted rogue tags - Stop the GitHerp!"
     echo "- Any changes from $ORIGIN/$BRANCH have been pulled into branch '$BRANCH'"
 }
