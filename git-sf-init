@@ -271,7 +271,7 @@ cmd_default() {
 
 	# Feature branches
 	if ! git config --get springflow.prefix.feature >/dev/null 2>&1 || flag force; then
-		default_suggestion=$(git config --get springflow.prefix.feature || echo WWW-)
+		default_suggestion=$(git config --get springflow.prefix.feature || echo SB-)
 		printf "Feature branches? [$default_suggestion] "
 		if flag ask; then
 			read answer
