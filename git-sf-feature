@@ -139,7 +139,7 @@ expand_nameprefix_arg() {
 
 	local expanded_name
 	local exitcode
-    track_repo=$(springflow_track_repo "$NAME" "$PREFIX" "$ORIGIN")	
+    track_repo=$(springflow_track_repo "$NAME" "$PREFIX" "$ORIGIN")
     expanded_name=$(springflow_resolve_nameprefix "$NAME" "$PREFIX")
 	exitcode=$?
 	case $exitcode in
@@ -223,13 +223,13 @@ cmd_start() {
 		die "Could not create feature branch '$BRANCH'"
 	fi
 
-	# push it back up to remote repo
-	springflow_push_latest_changes_to_origin
+	# don't push it back up to remote repo
+	# springflow_push_latest_changes_to_origin
 
 	echo
 	echo "Summary of actions:"
 	echo "- A new branch '$BRANCH' was created, based on '$BASE'"
-	echo "- The branch '$BRANCH' has been pushed up to '$ORIGIN/$BRANCH'"
+	# echo "- The branch '$BRANCH' has been pushed up to '$ORIGIN/$BRANCH'"
 	echo "- You are now on branch '$BRANCH'"
 	echo ""
 	echo "Now, start committing on your feature. When done, create a"
