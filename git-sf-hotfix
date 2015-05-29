@@ -213,12 +213,12 @@ cmd_start() {
 	git checkout -b "$BRANCH" "$BASE"
 
 	# push it back up to remote repo
-	springflow_push_latest_changes_to_origin
+  # springflow_push_latest_changes_to_origin
 
 	echo
 	echo "Summary of actions:"
 	echo "- A new branch '$BRANCH' was created, based on '$BASE'"
-	echo "- The branch '$BRANCH' has been pushed up to '$ORIGIN/$BRANCH'"
+  # echo "- The branch '$BRANCH' has been pushed up to '$ORIGIN/$BRANCH'"
 	echo "- You are now on branch '$BRANCH'"
 	echo
 	echo "Follow-up actions:"
