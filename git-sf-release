@@ -230,6 +230,8 @@ cmd_finish() {
 
 	# update local repo with remote changes first, if asked
 	if flag fetch; then
+  	# be sure we're on the release branch
+  	git checkout "$BRANCH"
 		# fetch and merge the latest changes from origin
 		springflow_merge_latest_changes_from_origin
 	fi
@@ -245,6 +247,9 @@ cmd_finish() {
 	fi
 	if has "$ORIGIN/$DEVELOP_BRANCH" $(git_remote_branches); then
 		require_branches_equal "$DEVELOP_BRANCH" "$ORIGIN/$DEVELOP_BRANCH"
+	fi
+	if has "$ORIGIN/$BRANCH" $(git_remote_branches); then
+		require_branches_equal "$BRANCH" "$ORIGIN/$BRANCH"
 	fi
 
 	# try to merge into master
